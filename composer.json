@@ -10,7 +10,7 @@
             "email": "koen@hoeijmakers.me"
         }
     ],
-    "require": {}
+    "require": {},
     "autoload": {
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\": "src/"
