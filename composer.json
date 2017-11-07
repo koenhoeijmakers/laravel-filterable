@@ -1,0 +1,8 @@
+{
+    "name": "koenhoeijmakers/filterable",
+    "description": "A Laravel trait that handles filtering through request variables.",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {}
+}
