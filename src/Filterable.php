@@ -11,23 +11,25 @@ trait Filterable
     /**
      * Filter the given query.
      *
-     * @param Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param Request $request
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function filter(Builder $query, Request $request)
+    protected function filter(Builder $query, Request $request): Builder
     {
         if ($request->filled('q')) {
             $this->filterSearch($query, $request->input('q', []));
         }
 
         $this->filterSort($query, $request);
+
+        return $query;
     }
 
     /**
      * Handle the filters for the search functionality.
      *
-     * @param Builder      $query
+     * @param \Illuminate\Database\Eloquent\Builder      $query
      * @param array|string $filter
      * @return void
      */
@@ -45,7 +47,7 @@ trait Filterable
     /**
      * Handle the sorting for the sort functionality.
      *
-     * @param Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param Request $request
      * @return void
      */
@@ -90,22 +92,11 @@ trait Filterable
      */
     protected function filterFor(Builder $query, $column, $value)
     {
-        if ($this->methodExists($method = $this->getFilterMethodName($column))) {
+        if (method_exists($this, $method = $this->getFilterMethodName($column))) {
             $this->{$method}($query, $value);
         } else {
             $query->where($column, 'LIKE', $value);
         }
-    }
-
-    /**
-     * Check if the class has the given method.
-     *
-     * @param $method
-     * @return bool
-     */
-    protected function methodExists($method)
-    {
-        return method_exists($this, $method);
     }
 
     /**
