@@ -1,6 +1,6 @@
 <?php
 
-namespace KoenHoeijmakers\Filterable;
+namespace KoenHoeijmakers\LaravelFilterable;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
