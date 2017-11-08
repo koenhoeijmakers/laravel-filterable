@@ -1,6 +1,7 @@
 {
     "name": "koenhoeijmakers/laravel-filterable",
     "description": "A Laravel trait that handles filtering through request variables.",
+    "require": {},
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
@@ -10,7 +11,6 @@
             "email": "koen@hoeijmakers.me"
         }
     ],
-    "require": {},
     "autoload": {
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\": "src/"
