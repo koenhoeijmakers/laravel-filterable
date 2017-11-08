@@ -12,7 +12,7 @@ trait Filterable
      * Filter the given query.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param Request $request
+     * @param \Illuminate\Http\Request              $request
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function filter(Builder $query, Request $request): Builder
@@ -29,8 +29,8 @@ trait Filterable
     /**
      * Handle the filters for the search functionality.
      *
-     * @param \Illuminate\Database\Eloquent\Builder      $query
-     * @param array|string $filter
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array|string                          $filter
      * @return void
      */
     protected function filterSearch(Builder $query, $filter)
@@ -48,7 +48,7 @@ trait Filterable
      * Handle the sorting for the sort functionality.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param Request $request
+     * @param \Illuminate\Http\Request              $request
      * @return void
      */
     protected function filterSort(Builder $query, Request $request)
