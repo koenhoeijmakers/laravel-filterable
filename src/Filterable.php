@@ -15,10 +15,8 @@ trait Filterable
      * @param Request $request
      * @return void
      */
-    protected function filter(
-        Builder &$query,
-        Request $request
-    ) {
+    protected function filter(Builder $query, Request $request)
+    {
         if ($request->filled('q')) {
             $this->filterSearch($query, $request->input('q', []));
         }
@@ -33,7 +31,7 @@ trait Filterable
      * @param array|string $filter
      * @return void
      */
-    protected function filterSearch(Builder &$query, $filter)
+    protected function filterSearch(Builder $query, $filter)
     {
         if (is_array($filter)) {
             foreach ($filter as $column => $value) {
@@ -51,7 +49,7 @@ trait Filterable
      * @param Request $request
      * @return void
      */
-    protected function filterSort(Builder &$query, Request $request)
+    protected function filterSort(Builder $query, Request $request)
     {
         $sortAsc = !$request->filled('sort-desc');
 
@@ -61,9 +59,7 @@ trait Filterable
         if (!empty($column)) {
             $query->orderBy($column, $sort);
         } else {
-            if ($this->methodExists($method = 'filterSortDefault')) {
-                $this->{$method}($query);
-            }
+            $this->filterSortDefault($query);
         }
     }
 
@@ -74,7 +70,15 @@ trait Filterable
      * @param string                                $filter
      * @return void
      */
-    abstract protected function filterString(Builder &$query, $filter);
+    abstract protected function filterString(Builder $query, $filter);
+
+    /**
+     * The default sorting.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return void
+     */
+    abstract protected function filterSortDefault(Builder $query);
 
     /**
      * The filtering for when an array of values is given.
@@ -84,7 +88,7 @@ trait Filterable
      * @param                                       $value
      * @return void
      */
-    protected function filterFor(Builder &$query, $column, $value)
+    protected function filterFor(Builder $query, $column, $value)
     {
         if ($this->methodExists($method = $this->getFilterMethodName($column))) {
             $this->{$method}($query, $value);
