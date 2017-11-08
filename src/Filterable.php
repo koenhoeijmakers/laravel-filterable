@@ -48,7 +48,7 @@ trait Filterable
      * Handle the sorting for the sort functionality.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Http\Request              $request
+     * @param \Illuminate\Http\Request $request
      * @return void
      */
     protected function filterSort(Builder $query, Request $request)
