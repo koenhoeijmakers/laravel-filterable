@@ -6,7 +6,7 @@
 
 A trait to easily implement filtering in your controllers.
 
-## Installation
+## Usage
 
 Require the package.
 ```sh
