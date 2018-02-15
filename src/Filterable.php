@@ -53,13 +53,8 @@ trait Filterable
      */
     protected function filterSort(Builder $query, Request $request)
     {
-        $sortAsc = !$request->filled('sort-desc');
-
-        $sort = $sortAsc ? 'asc' : 'desc';
-        $column = $sortAsc ? $request->input('sort-asc') : $request->input('sort-desc');
-
-        if (!empty($column)) {
-            $query->orderBy($column, $sort);
+        if (!empty($sortBy = $request->input('sortBy'))) {
+            $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
         } else {
             $this->filterSortDefault($query);
         }
