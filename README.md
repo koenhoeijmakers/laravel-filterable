@@ -10,5 +10,5 @@ A trait to easily implement filtering in your controllers.
 
 Require the package.
 ```sh
-composer require koenhoeijmakers/laravel-filterable:1.0-rc1
+composer require koenhoeijmakers/laravel-filterable
 ```
