@@ -40,7 +40,9 @@ trait Filterable
                 $this->filterFor($query, $column, $value);
             }
         } else {
-            $this->filterString($query, $filter);
+            if (method_exists($this, 'filterString')) {
+                $this->filterString($query, $filter);
+            }
         }
     }
 
@@ -56,26 +58,11 @@ trait Filterable
         if (!empty($sortBy = $request->input('sortBy'))) {
             $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
         } else {
-            $this->filterSortDefault($query);
+            if (method_exists($this, 'filterSortDefault')) {
+                $this->filterSortDefault($query);
+            }
         }
     }
-
-    /**
-     * The filtering for when only a single value is given.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string                                $filter
-     * @return void
-     */
-    abstract protected function filterString(Builder $query, $filter);
-
-    /**
-     * The default sorting.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return void
-     */
-    abstract protected function filterSortDefault(Builder $query);
 
     /**
      * The filtering for when an array of values is given.
