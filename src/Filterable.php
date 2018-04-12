@@ -77,7 +77,7 @@ trait Filterable
         if (method_exists($this, $method = $this->getFilterMethodName($column))) {
             $this->{$method}($query, $value);
         } else {
-            $query->where($column, 'LIKE', $value);
+            $query->where($column, 'LIKE', '%' . $value . '%');
         }
     }
 
