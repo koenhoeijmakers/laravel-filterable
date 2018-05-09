@@ -56,7 +56,11 @@ trait Filterable
     protected function filterSort(Builder $query, Request $request)
     {
         if (!empty($sortBy = $request->input('sortBy'))) {
-            $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
+            if (method_exists($this, $method = $this->getFilterSortMethodName($sortBy))) {
+                $this->{$method}($query);
+            } else {
+                $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
+            }
         } else {
             if (method_exists($this, 'filterSortDefault')) {
                 $this->filterSortDefault($query);
@@ -90,5 +94,16 @@ trait Filterable
     protected function getFilterMethodName($column)
     {
         return 'filterFor' . Str::studly($column);
+    }
+
+    /**
+     * Get the filter sort method name.
+     *
+     * @param $column
+     * @return string
+     */
+    protected function getFilterSortMethodName($column)
+    {
+        return 'filterSort' . Str::studly($column);
     }
 }
