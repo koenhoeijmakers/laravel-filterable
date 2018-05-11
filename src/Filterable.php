@@ -57,7 +57,7 @@ trait Filterable
     {
         if (!empty($sortBy = $request->input('sortBy'))) {
             if (method_exists($this, $method = $this->getFilterSortMethodName($sortBy))) {
-                $this->{$method}($query);
+                $this->{$method}($query, $request->input('desc', false) ? 'desc' : 'asc');
             } else {
                 $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
             }
