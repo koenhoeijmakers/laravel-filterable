@@ -9,11 +9,11 @@ class OrderBy implements Sorter
 {
     /**
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param                                       $column
+     * @param string                                $column
      * @param                                       $type
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder|mixed
      */
-    public function __invoke(Builder $builder, $column, $type)
+    public function __invoke(Builder $builder, string $column, $type)
     {
         return $builder->orderBy($column, $type);
     }
