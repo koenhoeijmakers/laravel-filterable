@@ -3,7 +3,7 @@
 namespace KoenHoeijmakers\LaravelFilterable\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
-use KoenHoeijmakers\LaravelFilterable\Contracts\Filter;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
 
 class Like implements Filter
 {
