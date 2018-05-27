@@ -2,108 +2,171 @@
 
 namespace KoenHoeijmakers\LaravelFilterable;
 
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter;
+use KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException;
 
-trait Filterable
+class Filterable
 {
     /**
-     * Filter the given query.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Http\Request              $request
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @var \Illuminate\Database\Eloquent\Builder
      */
-    protected function filter(Builder $query, Request $request): Builder
+    protected $builder;
+
+    /**
+     * @var \Illuminate\Http\Request
+     */
+    protected $request;
+
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
+     * @var array
+     */
+    protected $filters;
+
+    /**
+     * @var array
+     */
+    protected $sorters;
+
+    /**
+     * Filter constructor.
+     *
+     * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \Illuminate\Http\Request                $request
+     */
+    public function __construct(Repository $config, Request $request)
     {
-        if ($request->filled('q')) {
-            $this->filterSearch($query, $request->input('q', []));
+        $this->config = $config;
+        $this->request = $request;
+    }
+
+    /**
+     * @param string $model
+     * @return \KoenHoeijmakers\LaravelFilterable\Filterable
+     * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
+     */
+    public function model(string $model)
+    {
+        if (!class_exists($model)) {
+            throw new FilterException(
+                sprintf('Unknown class [%s] passed to [%s]', $model, static::class)
+            );
         }
 
-        $this->filterSort($query, $request);
-
-        return $query;
+        return static::query($model::query());
     }
 
     /**
-     * Handle the filters for the search functionality.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array|string                          $filter
-     * @return void
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @return \KoenHoeijmakers\LaravelFilterable\Filterable
      */
-    protected function filterSearch(Builder $query, $filter)
+    public function query(Builder $builder)
     {
-        if (is_array($filter)) {
-            foreach ($filter as $column => $value) {
-                $this->filterFor($query, $column, $value);
-            }
-        } else {
-            if (method_exists($this, 'filterString')) {
-                $this->filterString($query, $filter);
-            }
+        $this->builder = $builder;
+
+        return $this;
+    }
+
+    /**
+     * @param array $filters
+     * @return $this
+     */
+    public function registerFilters(array $filters)
+    {
+        foreach ($filters as $key => $filter) {
+            $this->registerFilter($key, $this->parseFilter($filter));
         }
+
+        return $this;
     }
 
     /**
-     * Handle the sorting for the sort functionality.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Http\Request              $request
-     * @return void
+     * @param $filter
+     * @return \Illuminate\Config\Repository|mixed
      */
-    protected function filterSort(Builder $query, Request $request)
+    protected function parseFilter($filter)
     {
-        if (!empty($sortBy = $request->input('sortBy'))) {
-            if (method_exists($this, $method = $this->getFilterSortMethodName($sortBy))) {
-                $this->{$method}($query, $request->input('desc', false) ? 'desc' : 'asc');
-            } else {
-                $query->orderBy($sortBy, $request->input('desc', false) ? 'desc' : 'asc');
-            }
-        } else {
-            if (method_exists($this, 'filterSortDefault')) {
-                $this->filterSortDefault($query);
-            }
+        if (in_array($filter, ['equal', 'like'])) {
+            return $this->getDefaultFilter($filter);
         }
-    }
 
-    /**
-     * The filtering for when an array of values is given.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param                                       $column
-     * @param                                       $value
-     * @return void
-     */
-    protected function filterFor(Builder $query, $column, $value)
-    {
-        if (method_exists($this, $method = $this->getFilterMethodName($column))) {
-            $this->{$method}($query, $value);
-        } else {
-            $query->where($column, 'LIKE', '%' . $value . '%');
+        if ($filter instanceof Filter) {
+            return $filter;
         }
+
+        return $filter;
     }
 
     /**
-     * Get the filter method name.
-     *
-     * @param $column
-     * @return string
+     * @param $filter
+     * @return \Illuminate\Config\Repository|mixed
      */
-    protected function getFilterMethodName($column)
+    protected function getDefaultFilter($filter)
     {
-        return 'filterFor' . Str::studly($column);
+        return $this->config->get('filterable.defaults.filters.' . $filter);
     }
 
     /**
-     * Get the filter sort method name.
+     * The default sorter.
      *
-     * @param $column
-     * @return string
+     * @return mixed
      */
-    protected function getFilterSortMethodName($column)
+    protected function getDefaultSorter()
     {
-        return 'filterSort' . Str::studly($column);
+        return $this->config->get('filterable.defaults.sorters.order_by');
+    }
+
+    /**
+     * @param string                                                      $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $filter
+     * @return $this
+     */
+    public function registerFilter(string $key, Filter $filter)
+    {
+        $this->filters[$key] = $filter;
+
+        return $this;
+    }
+
+    /**
+     * @param array $sorters
+     * @return $this
+     */
+    public function registerSorters(array $sorters)
+    {
+        foreach ($sorters as $key => $sorter) {
+            $this->registerSorter($key, $sorter);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string                                                      $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $sorter
+     * @return $this
+     */
+    public function registerSorter(string $key, Sorter $sorter)
+    {
+        $this->sorters[$key] = $sorter;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    protected function hasCustomSorter(string $key)
+    {
+        return array_key_exists($key, $this->sorters);
     }
 }
