@@ -91,18 +91,21 @@ class Filterable
     /**
      * @param $filter
      * @return \Illuminate\Config\Repository|mixed
+     * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     protected function parseFilter($filter)
     {
-        if (in_array($filter, ['equal', 'like'])) {
-            return $this->getPlainFilter($filter);
-        }
-
         if ($filter instanceof Filter) {
             return $filter;
         }
 
-        return $filter;
+        if (in_array($filter, array_keys($this->config->get('filterable.filters')))) {
+            return $this->getPlainFilter($filter);
+        }
+
+        throw new FilterException(
+            sprintf('Class [%s] is not a valid filter.', $filter)
+        );
     }
 
     /**
@@ -238,15 +241,17 @@ class Filterable
      */
     protected function handleFiltering()
     {
-        foreach ($this->request->input('q') as $key => $value) {
-            if ($this->hasFilter($key)) {
-                $invokable = $this->getFilter($key);
-
-                /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $invokable */
-                $invokable = new $invokable();
-
-                $invokable($this->getBuilder(), $key, $value);
+        foreach ($this->request->input($this->config->get('filterable.keys.filter')) as $key => $value) {
+            if (!$this->hasFilter($key)) {
+                continue;
             }
+
+            $invokable = $this->getFilter($key);
+
+            /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $invokable */
+            $invokable = new $invokable();
+
+            $invokable($this->getBuilder(), $key, $value);
         }
     }
 
@@ -257,16 +262,18 @@ class Filterable
      */
     protected function handleSorting()
     {
-        if ($this->request->filled('sortBy') && $this->request->filled('sortDesc')) {
-            $key = $this->request->input('sortBy');
-            $sortDesc = $this->request->input('sortDesc', false);
+        $sortBy = $this->request->input($this->config->get('filterable.keys.sortBy'));
+        $sortDesc = $this->request->input($this->config->get('filterable.keys.sortDesc'), false);
 
-            $invokable = $this->hasSorter($key) ? $this->getSorter($key) : $this->getDefaultSorter();
-
-            /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $invokable */
-            $invokable = new $invokable();
-
-            $invokable($this->getBuilder(), $key, $sortDesc ? 'desc' : 'asc');
+        if (empty($sortBy)) {
+            return;
         }
+
+        $invokable = $this->hasSorter($sortBy) ? $this->getSorter($sortBy) : $this->getDefaultSorter();
+
+        /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $invokable */
+        $invokable = new $invokable();
+
+        $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
     }
 }
