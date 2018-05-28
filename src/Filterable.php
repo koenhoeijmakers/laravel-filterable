@@ -4,7 +4,6 @@ namespace KoenHoeijmakers\LaravelFilterable;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter;
@@ -52,16 +51,9 @@ class Filterable
     /**
      * @param string $model
      * @return \KoenHoeijmakers\LaravelFilterable\Filterable
-     * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     public function model(string $model)
     {
-        if (!is_a($model, Model::class)) {
-            throw new FilterException(
-                sprintf('Unknown class [%s] passed to [%s]', $model, static::class)
-            );
-        }
-
         return $this->query($model::query());
     }
 
@@ -97,7 +89,7 @@ class Filterable
     protected function parseFilter($filter)
     {
         if (is_string($filter) && in_array($filter, array_keys($this->config->get('filterable.filters')))) {
-            $filter = $this->getAccessibleFilter($filter);
+            $filter = $this->config->get('filterable.filters.' . $filter);
         }
 
         if (is_a($filter, Filter::class)) {
@@ -107,35 +99,6 @@ class Filterable
         throw new FilterException(
             'Class [' . $filter . '] is not a valid filter.'
         );
-    }
-
-    /**
-     * @param string $filter
-     * @return string
-     */
-    protected function getAccessibleFilter(string $filter)
-    {
-        return $this->config->get('filterable.filters.' . $filter);
-    }
-
-    /**
-     * The default filter.
-     *
-     * @return string
-     */
-    protected function getDefaultFilter()
-    {
-        return $this->config->get('filterable.default.filter');
-    }
-
-    /**
-     * The default sorter.
-     *
-     * @return mixed
-     */
-    protected function getDefaultSorter()
-    {
-        return $this->config->get('filterable.default.sorter');
     }
 
     /**
@@ -171,7 +134,7 @@ class Filterable
     protected function parseSorter($sorter)
     {
         if (is_string($sorter) && in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
-            $sorter = $this->getAccessibleSorter($sorter);
+            $sorter = $this->config->get('filterable.sorters.' . $sorter);
         }
 
         if (is_a($sorter, Sorter::class)) {
@@ -181,15 +144,6 @@ class Filterable
         throw new FilterException(
             'Class [' . $sorter . '] is not a valid filter.'
         );
-    }
-
-    /**
-     * @param string $sorter
-     * @return mixed
-     */
-    protected function getAccessibleSorter(string $sorter)
-    {
-        return $this->config->get('filterable.sorters.' . $sorter);
     }
 
     /**
@@ -272,10 +226,6 @@ class Filterable
     protected function handleFiltering()
     {
         foreach ($this->request->input($this->config->get('filterable.keys.filter')) as $key => $value) {
-            if (!$this->hasFilter($key)) {
-                continue;
-            }
-
             $invokable = $this->getInvokableSorter($key);
 
             $invokable($this->getBuilder(), $key, $value);
@@ -288,7 +238,7 @@ class Filterable
      */
     protected function getInvokableFilter(string $key)
     {
-        $invokable = $this->hasFilter($key) ? $this->getFilter($key) : $this->getDefaultFilter();
+        $invokable = $this->hasFilter($key) ? $this->getFilter($key) : $this->config->get('filterable.default.filter');
 
         if (!$invokable instanceof Filter) {
             $invokable = new $invokable();
@@ -322,7 +272,7 @@ class Filterable
      */
     protected function getInvokableSorter(string $key)
     {
-        $invokable = $this->hasSorter($key) ? $this->getSorter($key) : $this->getDefaultSorter();
+        $invokable = $this->hasSorter($key) ? $this->getSorter($key) : $this->config->get('filterable.default.sorter');
 
         if (!$invokable instanceof Sorter) {
             $invokable = new $invokable();
