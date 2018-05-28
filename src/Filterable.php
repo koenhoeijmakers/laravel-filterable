@@ -275,14 +275,25 @@ class Filterable
                 continue;
             }
 
-            $invokable = $this->getFilter($key);
-
-            if (!$invokable instanceof Filter) {
-                $invokable = new $invokable();
-            }
+            $invokable = $this->getInvokableSorter($key);
 
             $invokable($this->getBuilder(), $key, $value);
         }
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    protected function getInvokableFilter(string $key)
+    {
+        $invokable = $this->hasFilter($key) ? $this->getFilter($key) : $this->getDefaultFilter();
+
+        if (!$invokable instanceof Filter) {
+            $invokable = new $invokable();
+        }
+
+        return $invokable;
     }
 
     /**
@@ -299,12 +310,23 @@ class Filterable
             return;
         }
 
-        $invokable = $this->hasSorter($sortBy) ? $this->getSorter($sortBy) : $this->getDefaultSorter();
+        $invokable = $this->getInvokableSorter($sortBy);
+
+        $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    protected function getInvokableSorter(string $key)
+    {
+        $invokable = $this->hasSorter($key) ? $this->getSorter($key) : $this->getDefaultSorter();
 
         if (!$invokable instanceof Sorter) {
             $invokable = new $invokable();
         }
 
-        $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
+        return $invokable;
     }
 }
