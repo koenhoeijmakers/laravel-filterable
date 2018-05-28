@@ -90,8 +90,8 @@ class Filterable
     }
 
     /**
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string $filter
-     * @return \Illuminate\Config\Repository|mixed
+     * @param $filter
+     * @return string|\KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter
      * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     protected function parseFilter($filter)
@@ -111,7 +111,7 @@ class Filterable
 
     /**
      * @param string $filter
-     * @return \Illuminate\Config\Repository|mixed
+     * @return string
      */
     protected function getAccessibleFilter(string $filter)
     {
@@ -121,7 +121,7 @@ class Filterable
     /**
      * The default filter.
      *
-     * @return mixed
+     * @return string
      */
     protected function getDefaultFilter()
     {
@@ -164,8 +164,8 @@ class Filterable
     }
 
     /**
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string $sorter
-     * @return mixed
+     * @param $sorter
+     * @return string|\KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter
      * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     protected function parseSorter($sorter)
