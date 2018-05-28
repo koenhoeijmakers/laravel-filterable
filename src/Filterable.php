@@ -95,7 +95,7 @@ class Filterable
     protected function parseFilter($filter)
     {
         if (in_array($filter, ['equal', 'like'])) {
-            return $this->getDefaultFilter($filter);
+            return $this->getPlainFilter($filter);
         }
 
         if ($filter instanceof Filter) {
@@ -109,9 +109,19 @@ class Filterable
      * @param $filter
      * @return \Illuminate\Config\Repository|mixed
      */
-    protected function getDefaultFilter($filter)
+    protected function getPlainFilter($filter)
     {
-        return $this->config->get('filterable.defaults.filters.' . $filter);
+        return $this->config->get('filterable.filters.' . $filter);
+    }
+
+    /**
+     * The default filter.
+     *
+     * @return mixed
+     */
+    protected function getDefaultFilter()
+    {
+        return $this->config->get('filterable.default.filter');
     }
 
     /**
@@ -121,7 +131,7 @@ class Filterable
      */
     protected function getDefaultSorter()
     {
-        return $this->config->get('filterable.defaults.sorters.order_by');
+        return $this->config->get('filterable.default.sorter');
     }
 
     /**
@@ -208,7 +218,7 @@ class Filterable
 
         $this->handleSorting();
 
-        return $this->builder;
+        return $this->getBuilder();
     }
 
     /**
@@ -235,7 +245,7 @@ class Filterable
                 /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $invokable */
                 $invokable = new $invokable();
 
-                $invokable($this->builder, $key, $value);
+                $invokable($this->getBuilder(), $key, $value);
             }
         }
     }
@@ -256,7 +266,7 @@ class Filterable
             /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $invokable */
             $invokable = new $invokable();
 
-            $invokable($this->builder, $key, $sortDesc ? 'desc' : 'asc');
+            $invokable($this->getBuilder(), $key, $sortDesc ? 'desc' : 'asc');
         }
     }
 }
