@@ -29,12 +29,12 @@ class Filterable
     /**
      * @var array
      */
-    protected $filters;
+    protected $filters = [];
 
     /**
      * @var array
      */
-    protected $sorters;
+    protected $sorters = [];
 
     /**
      * Filter constructor.
@@ -82,25 +82,25 @@ class Filterable
     public function registerFilters(array $filters)
     {
         foreach ($filters as $key => $filter) {
-            $this->registerFilter($key, $this->parseFilter($filter));
+            $this->registerFilter($key, $filter);
         }
 
         return $this;
     }
 
     /**
-     * @param $filter
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string $filter
      * @return \Illuminate\Config\Repository|mixed
      * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     protected function parseFilter($filter)
     {
-        if ($filter instanceof Filter) {
-            return $filter;
+        if (in_array($filter, array_keys($this->config->get('filterable.filters')))) {
+            $filter = $this->getAccessibleFilter($filter);
         }
 
-        if (in_array($filter, array_keys($this->config->get('filterable.filters')))) {
-            return $this->getAccessibleFilter($filter);
+        if (is_a($filter, Filter::class)) {
+            return $filter;
         }
 
         throw new FilterException(
@@ -109,10 +109,10 @@ class Filterable
     }
 
     /**
-     * @param $filter
+     * @param string $filter
      * @return \Illuminate\Config\Repository|mixed
      */
-    protected function getAccessibleFilter($filter)
+    protected function getAccessibleFilter(string $filter)
     {
         return $this->config->get('filterable.filters.' . $filter);
     }
@@ -138,13 +138,13 @@ class Filterable
     }
 
     /**
-     * @param string                                                      $key
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $filter
+     * @param string                                                             $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string $filter
      * @return $this
      */
-    public function registerFilter(string $key, Filter $filter)
+    public function registerFilter(string $key, $filter)
     {
-        $this->filters[$key] = $filter;
+        $this->filters[$key] = $this->parseFilter($filter);
 
         return $this;
     }
@@ -156,25 +156,25 @@ class Filterable
     public function registerSorters(array $sorters)
     {
         foreach ($sorters as $key => $sorter) {
-            $this->registerSorter($key, $this->parseSorter($sorter));
+            $this->registerSorter($key, $sorter);
         }
 
         return $this;
     }
 
     /**
-     * @param $sorter
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string $sorter
      * @return mixed
      * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
      */
     protected function parseSorter($sorter)
     {
-        if ($sorter instanceof Filter) {
-            return $sorter;
+        if (in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
+            $sorter = $this->getAccessibleSorter($sorter);
         }
 
-        if (in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
-            return $this->getAccessibleSorter($sorter);
+        if (is_a($sorter, Sorter::class)) {
+            return $sorter;
         }
 
         throw new FilterException(
@@ -192,13 +192,13 @@ class Filterable
     }
 
     /**
-     * @param string                                                      $key
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $sorter
+     * @param string                                                             $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string $sorter
      * @return $this
      */
-    public function registerSorter(string $key, Sorter $sorter)
+    public function registerSorter(string $key, $sorter)
     {
-        $this->sorters[$key] = $sorter;
+        $this->sorters[$key] = $this->parseSorter($sorter);
 
         return $this;
     }
@@ -277,8 +277,9 @@ class Filterable
 
             $invokable = $this->getFilter($key);
 
-            /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter $invokable */
-            $invokable = new $invokable();
+            if (!$invokable instanceof Filter) {
+                $invokable = new $invokable();
+            }
 
             $invokable($this->getBuilder(), $key, $value);
         }
@@ -300,8 +301,9 @@ class Filterable
 
         $invokable = $this->hasSorter($sortBy) ? $this->getSorter($sortBy) : $this->getDefaultSorter();
 
-        /** @var \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter $invokable */
-        $invokable = new $invokable();
+        if (!$invokable instanceof Sorter) {
+            $invokable = new $invokable();
+        }
 
         $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
     }
