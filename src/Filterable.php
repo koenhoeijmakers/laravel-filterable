@@ -100,7 +100,7 @@ class Filterable
         }
 
         if (in_array($filter, array_keys($this->config->get('filterable.filters')))) {
-            return $this->getPlainFilter($filter);
+            return $this->getAccessibleFilter($filter);
         }
 
         throw new FilterException(
@@ -112,7 +112,7 @@ class Filterable
      * @param $filter
      * @return \Illuminate\Config\Repository|mixed
      */
-    protected function getPlainFilter($filter)
+    protected function getAccessibleFilter($filter)
     {
         return $this->config->get('filterable.filters.' . $filter);
     }
@@ -156,10 +156,39 @@ class Filterable
     public function registerSorters(array $sorters)
     {
         foreach ($sorters as $key => $sorter) {
-            $this->registerSorter($key, $sorter);
+            $this->registerSorter($key, $this->parseSorter($sorter));
         }
 
         return $this;
+    }
+
+    /**
+     * @param $sorter
+     * @return mixed
+     * @throws \KoenHoeijmakers\LaravelFilterable\Exceptions\FilterException
+     */
+    protected function parseSorter($sorter)
+    {
+        if ($sorter instanceof Filter) {
+            return $sorter;
+        }
+
+        if (in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
+            return $this->getAccessibleSorter($sorter);
+        }
+
+        throw new FilterException(
+            sprintf('Class [%s] is not a valid sorter.', $sorter)
+        );
+    }
+
+    /**
+     * @param string $sorter
+     * @return mixed
+     */
+    protected function getAccessibleSorter(string $sorter)
+    {
+        return $this->config->get('filterable.sorters.' . $sorter);
     }
 
     /**

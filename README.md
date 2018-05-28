@@ -28,7 +28,7 @@ class ProductController extends Controller
 }
 ```
 
-... or resolve on from the container.
+... or resolve it from the container.
 ```php
 $filterable = app(Filterable::class);
 ```
