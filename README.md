@@ -96,3 +96,21 @@ $filterable->registerSorters([
     'relation' => SuperCustomRelationFilter::class
 ]);
 ```
+
+### Executing the filters and orders
+After you've registered the filters and orders you may call the following to execute them.
+```php
+$filterable->filter();
+```
+
+This returns an eloquent query builder, and thus you're free to use `->get()` or `->paginate()` or whatever your needs may be.
+
+### Adding advanced querying
+You might want to add some extra wheres or implement a scope for a `Filterable` instance.
+
+For this you can do the following.
+```php
+$query = $filterable->getBuilder();
+
+$query->where(...)->someScope(...);
+```
