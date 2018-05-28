@@ -4,6 +4,7 @@ namespace KoenHoeijmakers\LaravelFilterable;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter;
@@ -55,13 +56,13 @@ class Filterable
      */
     public function model(string $model)
     {
-        if (!class_exists($model)) {
+        if (!is_a($model, Model::class)) {
             throw new FilterException(
                 sprintf('Unknown class [%s] passed to [%s]', $model, static::class)
             );
         }
 
-        return static::query($model::query());
+        return $this->query($model::query());
     }
 
     /**
@@ -95,7 +96,7 @@ class Filterable
      */
     protected function parseFilter($filter)
     {
-        if (in_array($filter, array_keys($this->config->get('filterable.filters')))) {
+        if (is_string($filter) && in_array($filter, array_keys($this->config->get('filterable.filters')))) {
             $filter = $this->getAccessibleFilter($filter);
         }
 
@@ -104,7 +105,7 @@ class Filterable
         }
 
         throw new FilterException(
-            sprintf('Class [%s] is not a valid filter.', $filter)
+            'Class [' . $filter . '] is not a valid filter.'
         );
     }
 
@@ -169,7 +170,7 @@ class Filterable
      */
     protected function parseSorter($sorter)
     {
-        if (in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
+        if (is_string($sorter) && in_array($sorter, array_keys($this->config->get('filterable.sorters')))) {
             $sorter = $this->getAccessibleSorter($sorter);
         }
 
@@ -178,7 +179,7 @@ class Filterable
         }
 
         throw new FilterException(
-            sprintf('Class [%s] is not a valid sorter.', $sorter)
+            'Class [' . $sorter . '] is not a valid filter.'
         );
     }
 
@@ -304,7 +305,7 @@ class Filterable
     protected function handleSorting()
     {
         $sortBy = $this->request->input($this->config->get('filterable.keys.sortBy'));
-        $sortDesc = $this->request->input($this->config->get('filterable.keys.sortDesc'), false);
+        $sortDesc = $this->request->input($this->config->get('filterable.keys.sortDesc'));
 
         if (empty($sortBy)) {
             return;
