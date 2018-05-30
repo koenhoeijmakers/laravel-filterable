@@ -37,6 +37,16 @@ class Filterable
     protected $sorters = [];
 
     /**
+     * @var bool
+     */
+    protected $useDefaultFilter = true;
+
+    /**
+     * @var bool
+     */
+    protected $useDefaultSorter = true;
+
+    /**
      * Filter constructor.
      *
      * @param \Illuminate\Contracts\Config\Repository $config
@@ -69,6 +79,30 @@ class Filterable
     }
 
     /**
+     * Disable the default filter.
+     *
+     * @return $this
+     */
+    public function disableDefaultFilter()
+    {
+        $this->useDefaultFilter = false;
+
+        return $this;
+    }
+
+    /**
+     * Disable the default sorter.
+     *
+     * @return $this
+     */
+    public function disableDefaultSorter()
+    {
+        $this->useDefaultSorter = false;
+
+        return $this;
+    }
+
+    /**
      * @param array $filters
      * @return $this
      */
@@ -77,6 +111,18 @@ class Filterable
         foreach ($filters as $key => $filter) {
             $this->registerFilter($key, $filter);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string                                                             $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string $filter
+     * @return $this
+     */
+    public function registerFilter(string $key, $filter)
+    {
+        $this->filters[$key] = $this->parseFilter($filter);
 
         return $this;
     }
@@ -102,18 +148,6 @@ class Filterable
     }
 
     /**
-     * @param string                                                             $key
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string $filter
-     * @return $this
-     */
-    public function registerFilter(string $key, $filter)
-    {
-        $this->filters[$key] = $this->parseFilter($filter);
-
-        return $this;
-    }
-
-    /**
      * @param array $sorters
      * @return $this
      */
@@ -122,6 +156,18 @@ class Filterable
         foreach ($sorters as $key => $sorter) {
             $this->registerSorter($key, $sorter);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string                                                             $key
+     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string $sorter
+     * @return $this
+     */
+    public function registerSorter(string $key, $sorter)
+    {
+        $this->sorters[$key] = $this->parseSorter($sorter);
 
         return $this;
     }
@@ -144,18 +190,6 @@ class Filterable
         throw new FilterException(
             'Class [' . $sorter . '] is not a valid filter.'
         );
-    }
-
-    /**
-     * @param string                                                             $key
-     * @param \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string $sorter
-     * @return $this
-     */
-    public function registerSorter(string $key, $sorter)
-    {
-        $this->sorters[$key] = $this->parseSorter($sorter);
-
-        return $this;
     }
 
     /**
@@ -240,11 +274,29 @@ class Filterable
     {
         $invokable = $this->hasFilter($key) ? $this->getFilter($key) : $this->config->get('filterable.default.filter');
 
+        if ($this->shouldUseDefaultFilter()) {
+
+        }
+
         if (!$invokable instanceof Filter) {
             $invokable = new $invokable();
         }
 
         return $invokable;
+    }
+
+    /**
+     * Whether the instance should use the default filter.
+     *
+     * @return bool
+     */
+    protected function shouldUseDefaultFilter()
+    {
+        if (isset($this->useDefaultFilter)) {
+            return $this->useDefaultFilter;
+        }
+
+        return (bool) $this->config->get('filterable.use_default_filter');
     }
 
     /**
@@ -279,5 +331,19 @@ class Filterable
         }
 
         return $invokable;
+    }
+
+    /**
+     * Whether the instance should use the default sorter.
+     *
+     * @return bool
+     */
+    protected function shouldUseDefaultSorter()
+    {
+        if (isset($this->useDefaultSorter)) {
+            return $this->useDefaultSorter;
+        }
+
+        return (bool) $this->config->get('filterable.use_default_sorter');
     }
 }

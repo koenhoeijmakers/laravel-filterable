@@ -4,7 +4,10 @@
 [![license](https://img.shields.io/github/license/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://github.com/koenhoeijmakers/laravel-filterable)
 [![Packagist](https://img.shields.io/packagist/dt/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://packagist.org/packages/koenhoeijmakers/laravel-filterable)
 
-A laravel package to implement filtering by request variables.
+A laravel package to implement filtering by request variables onto a query builder.
+```php
+example.com/json?q[name]=Koen
+```
 
 ## Usage
 Require the package.
@@ -113,4 +116,25 @@ For this you can do the following.
 $query = $filterable->getBuilder();
 
 $query->where(...)->someScope(...);
+```
+
+### Disabling default filtering and sorting
+You can disable the "default" filtering or sorting, so that only registered filters or sorters will be queried.
+
+This can be done globally from the config.
+```php
+return [
+    //...
+    'use_default_filter' => false,
+    
+    'use_defualt_sorter' => false,
+    //...
+];
+```
+
+... or on the instance itself.
+```php
+$filterable->disableDefaultFilter();
+
+$filterable->disableDefaultSorter();
 ```

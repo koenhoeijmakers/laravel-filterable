@@ -22,6 +22,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Use default filter
+    |--------------------------------------------------------------------------
+    |
+    | Whether all instances should by default use the "default.filter" when
+    | no filter is registered for the given key.
+    |
+    */
+    'use_default_filter' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Use default sorter
+    |--------------------------------------------------------------------------
+    |
+    | Whether all instances should by default use the "default.sorter" when
+    | no sorter is registered for the given key.
+    |
+    */
+    'use_default_sorter' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Filters
     |--------------------------------------------------------------------------
     |
