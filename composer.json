@@ -19,5 +19,12 @@
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KoenHoeijmakers\\LaravelFilterable\\FilterableServiceProvider"
+            ]
+        }
     }
 }
