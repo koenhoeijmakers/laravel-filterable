@@ -108,16 +108,6 @@ $filterable->filter();
 
 This returns an eloquent query builder, and thus you're free to use `->get()` or `->paginate()` or whatever your needs may be.
 
-### Adding advanced querying
-You might want to add some extra wheres or implement a scope for a `Filterable` instance.
-
-For this you can do the following.
-```php
-$query = $filterable->getBuilder();
-
-$query->where(...)->someScope(...);
-```
-
 ### Disabling default filtering and sorting
 You can disable the "default" filtering or sorting, so that only registered filters or sorters will be queried.
 
