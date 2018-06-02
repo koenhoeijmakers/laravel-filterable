@@ -39,12 +39,12 @@ class Filterable
     /**
      * @var bool
      */
-    protected $useDefaultFilter = true;
+    protected $useDefaultFilter;
 
     /**
      * @var bool
      */
-    protected $useDefaultSorter = true;
+    protected $useDefaultSorter;
 
     /**
      * Filter constructor.
@@ -138,7 +138,7 @@ class Filterable
             $filter = $this->config->get('filterable.filters.' . $filter);
         }
 
-        if (is_a($filter, Filter::class)) {
+        if (is_subclass_of($filter, Filter::class)) {
             return $filter;
         }
 
@@ -183,7 +183,7 @@ class Filterable
             $sorter = $this->config->get('filterable.sorters.' . $sorter);
         }
 
-        if (is_a($sorter, Sorter::class)) {
+        if (is_subclass_of($sorter, Sorter::class)) {
             return $sorter;
         }
 
@@ -259,8 +259,14 @@ class Filterable
      */
     protected function handleFiltering()
     {
-        foreach ($this->request->input($this->config->get('filterable.keys.filter')) as $key => $value) {
-            $invokable = $this->getInvokableSorter($key);
+        $parameters = $this->request->input($this->config->get('filterable.keys.filter'));
+
+        if (!is_array($parameters)) {
+            return;
+        }
+
+        foreach ($parameters as $key => $value) {
+            $invokable = $this->getInvokableFilter($key);
 
             if ($invokable instanceof Filter) {
                 $invokable($this->getBuilder(), $key, $value);
@@ -306,8 +312,8 @@ class Filterable
      */
     protected function handleSorting()
     {
-        $sortBy = $this->request->input($this->config->get('filterable.keys.sortBy'));
-        $sortDesc = $this->request->input($this->config->get('filterable.keys.sortDesc'));
+        $sortBy = $this->request->input($this->config->get('filterable.keys.sort_by'));
+        $sortDesc = $this->request->input($this->config->get('filterable.keys.sort_desc'));
 
         if (empty($sortBy)) {
             return;
@@ -328,7 +334,7 @@ class Filterable
     {
         if ($this->hasSorter($key)) {
             $invokable = $this->getSorter($key);
-        } elseif ($this->shouldUseDefaultFilter()) {
+        } elseif ($this->shouldUseDefaultSorter()) {
             $invokable = $this->config->get('filterable.default.sorter');
         } else {
             return null;
