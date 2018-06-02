@@ -91,6 +91,18 @@ class Filterable
     }
 
     /**
+     * Enable the default filter.
+     *
+     * @return $this
+     */
+    public function enableDefaultFilter()
+    {
+        $this->useDefaultFilter = false;
+
+        return $this;
+    }
+
+    /**
      * Disable the default sorter.
      *
      * @return $this
@@ -98,6 +110,18 @@ class Filterable
     public function disableDefaultSorter()
     {
         $this->useDefaultSorter = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable the default sorter.
+     *
+     * @return $this
+     */
+    public function enableDefaultSorter()
+    {
+        $this->useDefaultSorter = true;
 
         return $this;
     }
