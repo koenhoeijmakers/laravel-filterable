@@ -262,27 +262,27 @@ class Filterable
         foreach ($this->request->input($this->config->get('filterable.keys.filter')) as $key => $value) {
             $invokable = $this->getInvokableSorter($key);
 
-            $invokable($this->getBuilder(), $key, $value);
+            if ($invokable instanceof Filter) {
+                $invokable($this->getBuilder(), $key, $value);
+            }
         }
     }
 
     /**
      * @param string $key
-     * @return mixed
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|null
      */
     protected function getInvokableFilter(string $key)
     {
-        $invokable = $this->hasFilter($key) ? $this->getFilter($key) : $this->config->get('filterable.default.filter');
-
-        if ($this->shouldUseDefaultFilter()) {
-
+        if ($this->hasFilter($key)) {
+            $invokable = $this->getFilter($key);
+        } elseif ($this->shouldUseDefaultFilter()) {
+            $invokable = $this->config->get('filterable.default.filter');
+        } else {
+            return null;
         }
 
-        if (!$invokable instanceof Filter) {
-            $invokable = new $invokable();
-        }
-
-        return $invokable;
+        return !$invokable instanceof Filter ? new $invokable() : $invokable;
     }
 
     /**
@@ -315,22 +315,26 @@ class Filterable
 
         $invokable = $this->getInvokableSorter($sortBy);
 
-        $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
+        if ($invokable instanceof Sorter) {
+            $invokable($this->getBuilder(), $sortBy, $sortDesc ? 'desc' : 'asc');
+        }
     }
 
     /**
      * @param string $key
-     * @return mixed
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|null
      */
     protected function getInvokableSorter(string $key)
     {
-        $invokable = $this->hasSorter($key) ? $this->getSorter($key) : $this->config->get('filterable.default.sorter');
-
-        if (!$invokable instanceof Sorter) {
-            $invokable = new $invokable();
+        if ($this->hasSorter($key)) {
+            $invokable = $this->getSorter($key);
+        } elseif ($this->shouldUseDefaultFilter()) {
+            $invokable = $this->config->get('filterable.default.sorter');
+        } else {
+            return null;
         }
 
-        return $invokable;
+        return !$invokable instanceof Sorter ? new $invokable() : $invokable;
     }
 
     /**
