@@ -96,7 +96,7 @@ $filterable->registerFilters([
 
 $filterable->registerSorters([
     'name'     => 'order_by',
-    'relation' => SuperCustomRelationFilter::class
+    'relation' => SuperCustomRelationSorter::class
 ]);
 ```
 
