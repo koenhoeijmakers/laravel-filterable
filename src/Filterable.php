@@ -322,11 +322,8 @@ class Filterable
      */
     protected function shouldUseDefaultFilter()
     {
-        if (isset($this->useDefaultFilter)) {
-            return $this->useDefaultFilter;
-        }
-
-        return (bool) $this->config->get('filterable.use_default_filter');
+        return property_exists($this, 'useDefaultFilter') ? $this->useDefaultFilter
+            : (bool) $this->config->get('filterable.use_default_filter');
     }
 
     /**
