@@ -227,7 +227,7 @@ class Filterable
 
     /**
      * @param string $key
-     * @return mixed
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|string
      */
     protected function getSorter(string $key)
     {
@@ -245,7 +245,7 @@ class Filterable
 
     /**
      * @param string $key
-     * @return mixed
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|string
      */
     protected function getFilter(string $key)
     {

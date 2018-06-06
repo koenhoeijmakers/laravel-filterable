@@ -10,7 +10,7 @@ interface Sorter
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @param string                                $column
      * @param string                                $type
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function __invoke(Builder $builder, string $column, string $type);
 }
