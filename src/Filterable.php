@@ -322,7 +322,7 @@ class Filterable
      */
     protected function shouldUseDefaultFilter()
     {
-        return property_exists($this, 'useDefaultFilter') ? $this->useDefaultFilter
+        return isset($this->useDefaultFilter) ? $this->useDefaultFilter
             : (bool) $this->config->get('filterable.use_default_filter');
     }
 
@@ -371,10 +371,7 @@ class Filterable
      */
     protected function shouldUseDefaultSorter()
     {
-        if (isset($this->useDefaultSorter)) {
-            return $this->useDefaultSorter;
-        }
-
-        return (bool) $this->config->get('filterable.use_default_sorter');
+        return isset($this->useDefaultSorter) ? $this->useDefaultSorter
+            : (bool) $this->config->get('filterable.use_default_sorter');
     }
 }
