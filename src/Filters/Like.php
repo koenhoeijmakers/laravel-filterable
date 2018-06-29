@@ -15,6 +15,6 @@ class Like implements Filter
      */
     public function __invoke(Builder $builder, string $column, $value)
     {
-        return $builder->where($column, 'LIKE', $value);
+        return $builder->where($column, 'LIKE', '%' . $value . '%');
     }
 }
