@@ -8,34 +8,22 @@ use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter;
 abstract class AbstractSorter implements Sorter
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Builder
-     */
-    protected $builder;
-
-    /**
      * @var string
      */
     protected $column;
 
     /**
-     * @var string
+     * @param string $column
      */
-    protected $type;
-
-    /**
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param string                                $type
-     */
-    public function __construct(Builder $builder, string $column, string $type)
+    public function __construct(string $column)
     {
-        $this->builder = $builder;
         $this->column = $column;
-        $this->type = $type;
     }
 
     /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                $type
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    abstract public function handle();
+    abstract public function handle(Builder $builder, string $type);
 }

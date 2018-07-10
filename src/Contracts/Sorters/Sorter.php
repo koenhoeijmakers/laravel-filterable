@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Builder;
 interface Sorter
 {
     /**
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param string                                $type
+     * @param string $column
      */
-    public function __construct(Builder $builder, string $column, string $type);
+    public function __construct(string $column);
 
     /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                $type
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function handle();
+    public function handle(Builder $builder, string $type);
 }

@@ -8,34 +8,22 @@ use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
 abstract class AbstractFilter implements Filter
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Builder
-     */
-    protected $builder;
-
-    /**
      * @var string
      */
     protected $column;
 
     /**
-     * @var mixed
+     * @param string $column
      */
-    protected $value;
-
-    /**
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param                                       $value
-     */
-    public function __construct(Builder $builder, string $column, $value)
+    public function __construct(string $column)
     {
-        $this->builder = $builder;
         $this->column = $column;
-        $this->value = $value;
     }
 
     /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param  mixed                                $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    abstract public function handle();
+    abstract public function handle(Builder $builder, $value);
 }

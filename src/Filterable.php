@@ -292,20 +292,19 @@ class Filterable
         }
 
         foreach ($parameters as $key => $value) {
-            $instance = $this->getFilterInstance($key, $value);
+            $instance = $this->getFilterInstance($key);
 
             if ($instance instanceof Filter) {
-                $instance->handle();
+                $instance->handle($this->getBuilder(), $value);
             }
         }
     }
 
     /**
      * @param string $key
-     * @param mixed  $value
      * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter|null
      */
-    protected function getFilterInstance(string $key, $value)
+    protected function getFilterInstance(string $key)
     {
         if ($this->hasFilter($key)) {
             $instance = $this->getFilter($key);
@@ -315,7 +314,7 @@ class Filterable
             return null;
         }
 
-        return !$instance instanceof Filter ? new $instance($this->getBuilder(), $key, $value) : $instance;
+        return !$instance instanceof Filter ? new $instance($key) : $instance;
     }
 
     /**
@@ -349,19 +348,18 @@ class Filterable
             $this->config->get('filterable.keys.sort_desc')
         );
 
-        $instance = $this->getSorterInstance($sortBy, $sortDesc ? 'desc' : 'asc');
+        $instance = $this->getSorterInstance($sortBy);
 
         if ($instance instanceof Sorter) {
-            $instance->handle();
+            $instance->handle($this->getBuilder(), $sortDesc ? 'desc' : 'asc');
         }
     }
 
     /**
      * @param string $key
-     * @param string $type
      * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter|null
      */
-    protected function getSorterInstance(string $key, string $type)
+    protected function getSorterInstance(string $key)
     {
         if ($this->hasSorter($key)) {
             $instance = $this->getSorter($key);
@@ -371,7 +369,7 @@ class Filterable
             return null;
         }
 
-        return !$instance instanceof Sorter ? new $instance($this->getBuilder(), $key, $type) : $instance;
+        return !$instance instanceof Sorter ? new $instance($key) : $instance;
     }
 
     /**
