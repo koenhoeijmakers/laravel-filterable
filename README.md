@@ -81,7 +81,10 @@ class CustomFilter extends AbstractFilter
      * @param  mixed                                $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    abstract public function handle(Builder $builder, $value);
+    public function handle(Builder $builder, $value)
+    {
+        return $builder->where($this->column, '=', $value);
+    }
 }
 ```
 
