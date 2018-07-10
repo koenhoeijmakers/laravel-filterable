@@ -26,4 +26,14 @@ abstract class AbstractFilter implements Filter
      * @return \Illuminate\Database\Eloquent\Builder
      */
     abstract public function handle(Builder $builder, $value);
+
+    /**
+     * Get the column.
+     *
+     * @return string
+     */
+    protected function getColumn()
+    {
+        return $this->column;
+    }
 }

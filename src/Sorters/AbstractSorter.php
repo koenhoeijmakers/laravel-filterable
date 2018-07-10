@@ -26,4 +26,14 @@ abstract class AbstractSorter implements Sorter
      * @return \Illuminate\Database\Eloquent\Builder
      */
     abstract public function handle(Builder $builder, string $type);
+
+    /**
+     * Get the column.
+     *
+     * @return string
+     */
+    protected function getColumn()
+    {
+        return $this->column;
+    }
 }

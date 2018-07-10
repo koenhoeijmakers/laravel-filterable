@@ -5,16 +5,15 @@ namespace KoenHoeijmakers\LaravelFilterable\Filters;
 use Illuminate\Database\Eloquent\Builder;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
 
-class Equal implements Filter
+class Equal extends AbstractFilter
 {
     /**
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param                                       $value
+     * @param  mixed                                $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke(Builder $builder, string $column, $value)
+    public function handle(Builder $builder, $value)
     {
-        return $builder->where($column, '=', $value);
+        return $builder->where($this->getColumn(), '=', $value);
     }
 }

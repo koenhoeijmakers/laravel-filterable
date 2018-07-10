@@ -5,16 +5,15 @@ namespace KoenHoeijmakers\LaravelFilterable\Sorters;
 use Illuminate\Database\Eloquent\Builder;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Sorter;
 
-class OrderBy implements Sorter
+class OrderBy extends AbstractSorter
 {
     /**
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param                                       $type
+     * @param string                                $type
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke(Builder $builder, string $column, string $type)
+    public function handle(Builder $builder, string $type)
     {
-        return $builder->orderBy($column, $type);
+        return $builder->orderBy($this->getColumn(), $type);
     }
 }
