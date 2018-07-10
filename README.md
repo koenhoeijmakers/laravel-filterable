@@ -59,25 +59,47 @@ $filterable->registerFilter('name', 'like');
 ```php
 namespace App\Filters;
 
-use KoenHoeijmakers\LaravelFilterable\Contracts\Filters\Filter;
+use KoenHoeijmakers\LaravelFilterable\Filters\AbstractFilter;
 
-class CustomFilter implements Filter
+class CustomFilter extends AbstractFilter
 {
-    public function __invoke(Builder $builder, string $column, $value)
+    /**
+     * @var string
+     */
+    protected $column;
+
+    /**
+     * @param string $column
+     */
+    public function __construct(string $column)
     {
-        return $builder->whereHas('prices', function (Builder $builder) use ($value) {
-            $builder->where('price', '=', $value);
-        });
+        $this->column = $column;
     }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param  mixed                                $value
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    abstract public function handle(Builder $builder, $value);
 }
 ```
-In this custom class `$column` is the columm you've assigned it to (in our case `name`)
-and value is the value gotten from the request.
 
+In this custom class `$column` is the columm you've assigned it to (in our case `name`) or what you have defined it for `new CustomFilter('not_name')`,
+and `$value` is the value gotten from the request.
+
+So to use the `name` key from the request you can do:
 ```php
 use App\Filters\CustomFilter;
 
 $filterable->registerFilter('name', CustomFilter::class);
+```
+
+... and if you'd like to override this key you can do:
+```php
+use App\Filters\CustomFilter;
+
+$filterable->registerFilter('name', new CustomFilter('title'));
 ```
 
 ### Registering sorters
@@ -86,21 +108,27 @@ Which work pretty much the same as filters.
 $filterable->registerSorter('name', 'order_by');
 ```
 
-### Multiple filters / sorters
-You can of course register multiple filters / sorters at once.
+### Multiple filters
+You can of course register multiple filters at once.
 ```php
 $filterable->registerFilters([
     'name'        => 'like',
     'description' => CustomFilter::class,
-]);
-
-$filterable->registerSorters([
-    'name'     => 'order_by',
-    'relation' => SuperCustomRelationSorter::class
+    'title'       => new TitleFilterOnDifferentColumn('not_the_title'),
 ]);
 ```
 
-### Executing the filters and orders
+### Multiple sorters
+You can of course register multiple sorters at once.
+```php
+$filterable->registerSorters([
+    'name'     => 'order_by',
+    'relation' => CustomSorter::class,
+    'title'    => new TitleSorterOnDifferentColumn('not_the_title'),
+]);
+```
+
+### Executing the filters and sorters
 After you've registered the filters and orders you may call the following to execute them.
 ```php
 $filterable->filter();
