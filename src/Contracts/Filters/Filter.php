@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Builder;
 interface Filter
 {
     /**
+     * @param string $column
+     */
+    public function __construct(string $column);
+
+    /**
      * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                $column
-     * @param                                       $value
+     * @param mixed                                 $value
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke(Builder $builder, string $column, $value);
+    public function handle(Builder $builder, $value);
 }
