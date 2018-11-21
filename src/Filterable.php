@@ -292,6 +292,10 @@ class Filterable
         }
 
         foreach ($parameters as $key => $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+            
             $instance = $this->getFilterInstance($key);
 
             if ($instance instanceof Filter) {
