@@ -2,7 +2,6 @@
 
 namespace KoenHoeijmakers\LaravelFilterable;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,9 +30,7 @@ class FilterableServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(Filterable::class, function (Application $app) {
-            return new Filterable($app['config'], $app['request']);
-        });
+        //
     }
 
     /**
@@ -73,11 +70,11 @@ class FilterableServiceProvider extends ServiceProvider
         $array = array_merge($original, $merging);
 
         foreach ($original as $key => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 continue;
             }
 
-            if (!Arr::exists($merging, $key)) {
+            if (! Arr::exists($merging, $key)) {
                 continue;
             }
 
