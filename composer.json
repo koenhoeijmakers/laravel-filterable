@@ -1,13 +1,9 @@
 {
     "name": "koenhoeijmakers/laravel-filterable",
-    "description": "A Laravel trait that handles filtering through request variables.",
-    "require": {
-        "php": ">=7.0",
-        "laravel/framework": "5.5.*|5.6.*|5.7.*"
-    },
+    "description": "Laravel request filtering",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "authors": [
         {
@@ -15,6 +11,10 @@
             "email": "koen@hoeijmakers.me"
         }
     ],
+    "require": {
+        "php": ">=7.0",
+        "laravel/framework": "5.5.*|5.6.*|5.7.*"
+    },
     "autoload": {
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\": "src/"
