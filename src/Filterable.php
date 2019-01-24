@@ -49,12 +49,12 @@ class Filterable
     /**
      * @var string|null
      */
-    protected $defaultSortBy;
+    protected $defaultSortBy = null;
 
     /**
      * @var bool|null
      */
-    protected $defaultSortDesc;
+    protected $defaultSortDesc = null;
 
     /**
      * Filter constructor.
