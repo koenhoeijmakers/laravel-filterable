@@ -47,6 +47,16 @@ class Filterable
     protected $useDefaultSorter;
 
     /**
+     * @var string|null
+     */
+    protected $defaultSortBy;
+
+    /**
+     * @var bool|null
+     */
+    protected $defaultSortDesc;
+
+    /**
      * Filter constructor.
      *
      * @param \Illuminate\Contracts\Config\Repository $config
@@ -287,7 +297,7 @@ class Filterable
             $this->config->get('filterable.keys.filter')
         );
 
-        if (!is_array($parameters)) {
+        if (! is_array($parameters)) {
             return;
         }
 
@@ -295,7 +305,7 @@ class Filterable
             if ($value === null || $value === '') {
                 continue;
             }
-            
+
             $instance = $this->getFilterInstance($key);
 
             if ($instance instanceof Filter) {
@@ -318,7 +328,7 @@ class Filterable
             return null;
         }
 
-        return !$instance instanceof Filter ? new $instance($key) : $instance;
+        return ! $instance instanceof Filter ? new $instance($key) : $instance;
     }
 
     /**
@@ -344,19 +354,42 @@ class Filterable
             $this->config->get('filterable.keys.sort_by')
         );
 
-        if (empty($sortBy)) {
-            return;
-        }
-
         $sortDesc = $this->request->input(
             $this->config->get('filterable.keys.sort_desc')
         );
+
+        if (
+            $sortDesc === null &&
+            $sortBy === null &&
+            $this->defaultSortDesc !== null &&
+            $this->defaultSortBy !== null
+        ) {
+            $sortDesc = $this->defaultSortDesc;
+            $sortBy = $this->defaultSortBy;
+        }
+
+        if (empty($sortBy)) {
+            return;
+        }
 
         $instance = $this->getSorterInstance($sortBy);
 
         if ($instance instanceof Sorter) {
             $instance->handle($this->getBuilder(), $sortDesc ? 'desc' : 'asc');
         }
+    }
+
+    /**
+     * @param string $sortBy
+     * @param bool   $sortDesc
+     * @return $this
+     */
+    public function setDefaultSorting(string $sortBy, bool $sortDesc = false)
+    {
+        $this->defaultSortBy = $sortBy;
+        $this->defaultSortDesc = $sortDesc;
+
+        return $this;
     }
 
     /**
@@ -373,7 +406,7 @@ class Filterable
             return null;
         }
 
-        return !$instance instanceof Sorter ? new $instance($key) : $instance;
+        return ! $instance instanceof Sorter ? new $instance($key) : $instance;
     }
 
     /**
