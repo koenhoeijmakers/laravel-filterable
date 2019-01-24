@@ -69,19 +69,19 @@ class Filterable
     }
 
     /**
-     * @param string $model
+     * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return \KoenHoeijmakers\LaravelFilterable\Filterable
      */
-    public function model(string $model)
+    public function query(Builder $builder)
     {
-        return $this->query($model::query());
+        return $this->builder($builder);
     }
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return \KoenHoeijmakers\LaravelFilterable\Filterable
      */
-    public function query(Builder $builder)
+    public function builder(Builder $builder)
     {
         $this->builder = $builder;
 
