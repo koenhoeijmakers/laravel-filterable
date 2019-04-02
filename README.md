@@ -20,11 +20,11 @@ Inject it in your controller.
 ```php
 namespace App\Http\Controllers;
 
-use KoenHoeijmakers\LaravelFilterable\Filterable;
+use KoenHoeijmakers\LaravelFilterable\Filtering;
 
 class ProductController extends Controller
 {
-    public function json(Filterable $filterable)
+    public function json(Filtering $filtering)
     {
         //
     }
