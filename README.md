@@ -15,8 +15,7 @@ Require the package.
 composer require koenhoeijmakers/laravel-filterable
 ```
 
-### Acquiring an instance.
-Inject it in your controller.
+Inject it in your controller (or resolve it from the container in any other way).
 ```php
 
 namespace App\Http\Controllers\User;
@@ -25,9 +24,24 @@ use KoenHoeijmakers\LaravelFilterable\Filtering;
 
 class Index extends Controller
 {
-    public function json(Filtering $filtering)
+    protected $filtering;
+
+    public function __construct(Filtering $filtering)
     {
-        //
+        $this->filtering = $filtering;
+    }
+
+    public function __invoke()
+    {
+        $builder = User::query();
+        
+        $this->filtering->builder($builder)
+            ->filterFor('name', function (Builder $builder, $value) {
+                $builder->where('name', 'like', $value . '%');
+            })
+            ->filter();
+    
+        return UserResource::collection($builder->paginate());
     }
 }
 ```

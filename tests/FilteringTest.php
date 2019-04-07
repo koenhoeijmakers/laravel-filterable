@@ -49,6 +49,22 @@ class FilteringTest extends TestCase
         );
     }
 
+    public function testWorksWithDotNotation()
+    {
+        $key = 'filter.name';
+
+        $this->request->replace(['filter' => ['name' => 'merchant']]);
+
+        $builder = $this->filtering->filterFor($key, function (Builder $builder, $value) {
+            $builder->where('name', $value);
+        })->filter();
+
+        $this->assertEquals(
+            'select * from "test_models" where "name" = ?',
+            $builder->toSql()
+        );
+    }
+
     public function testRegisteredSortForWorksImplicitly()
     {
         $this->request->replace(['sortBy' => 'name', 'desc' => true]);
