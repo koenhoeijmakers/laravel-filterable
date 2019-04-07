@@ -28,5 +28,12 @@
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\Tests\\": "tests/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KoenHoeijmakers\\LaravelFilterable\\FilterableServiceProvider"
+            ]
+        }
     }
 }

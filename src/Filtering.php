@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace KoenHoeijmakers\LaravelFilterable;
 
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use function array_key_exists;
@@ -15,6 +16,11 @@ class Filtering
      * @var \Illuminate\Http\Request
      */
     protected $request;
+
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
 
     /**
      * @var Builder
@@ -32,7 +38,7 @@ class Filtering
     protected $sorters = [];
 
     /**
-     * @var bool|null
+     * @var string|null
      */
     protected $defaultSortBy = null;
 
@@ -44,11 +50,13 @@ class Filtering
     /**
      * Filtering constructor.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request                $request
+     * @param  \Illuminate\Contracts\Config\Repository $config
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, Repository $config)
     {
         $this->request = $request;
+        $this->config = $config;
     }
 
     /**
@@ -156,7 +164,10 @@ class Filtering
      */
     protected function getDesc(): bool
     {
-        return (bool) $this->request->input('desc', $this->defaultSortDesc);
+        return (bool) $this->request->input(
+            $this->config->get('filterable.keys.sort_desc'),
+            $this->defaultSortDesc
+        );
     }
 
     /**
@@ -164,7 +175,9 @@ class Filtering
      */
     protected function getSortBy(): ?string
     {
-        $sortBy = $this->request->input('sortBy');
+        $sortBy = $this->request->input(
+            $this->config->get('filterable.keys.sort_by')
+        );
 
         if (null === $sortBy && null !== $this->defaultSortBy) {
             $sortBy = $this->defaultSortBy;
