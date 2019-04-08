@@ -1,12 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KoenHoeijmakers\LaravelFilterable;
 
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
 class FilterableServiceProvider extends ServiceProvider
 {
+    /**
+     * Register bindings in the container.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
+
     /**
      * Perform post-registration booting of services.
      *
@@ -21,16 +34,6 @@ class FilterableServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             $this->packageRootPath('config/filterable.php'), 'filterable'
         );
-    }
-
-    /**
-     * Register bindings in the container.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
     }
 
     /**
@@ -53,9 +56,12 @@ class FilterableServiceProvider extends ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        $config = $this->app['config']->get($key, []);
+        /** @var Repository $repository */
+        $repository = $this->app->make(Repository::class);
 
-        $this->app['config']->set($key, $this->mergeConfig(require $path, $config));
+        $config = $repository->get($key, []);
+
+        $repository->set($key, $this->mergeConfig(require $path, $config));
     }
 
     /**

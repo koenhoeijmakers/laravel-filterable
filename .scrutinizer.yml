@@ -1,0 +1,15 @@
+build:
+  nodes:
+    analysis:
+      project_setup:
+        override:
+          - 'true'
+      tests:
+        override:
+          - php-scrutinizer-run
+          - command: ./vendor/bin/phpunit --coverage-clover=coverage.clover
+            coverage:
+              file: coverage.clover
+              format: php-clover
+checks:
+  php: true

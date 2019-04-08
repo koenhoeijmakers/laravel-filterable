@@ -1,6 +1,14 @@
 {
     "name": "koenhoeijmakers/laravel-filterable",
-    "description": "Laravel request filtering",
+    "description": "Explicit request filtering.",
+    "require": {
+        "php": ">=7.2",
+        "laravel/framework": "5.8.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^3.8",
+        "phpunit/phpunit": "^8.0"
+    },
     "type": "library",
     "license": "MIT",
     "minimum-stability": "stable",
@@ -11,13 +19,14 @@
             "email": "koen@hoeijmakers.me"
         }
     ],
-    "require": {
-        "php": ">=7.0",
-        "laravel/framework": "^5.5"
-    },
     "autoload": {
         "psr-4": {
             "KoenHoeijmakers\\LaravelFilterable\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KoenHoeijmakers\\LaravelFilterable\\Tests\\": "tests/"
         }
     },
     "extra": {
