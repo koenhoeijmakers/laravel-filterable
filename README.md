@@ -6,7 +6,7 @@
 
 A laravel package to implement filtering by request parameters.
 ```php
-example.com/json?q[name]=Koen
+example.com/json?name=Koen
 ```
 
 ## Usage
@@ -39,6 +39,7 @@ class Index extends Controller
             ->filterFor('name', function (Builder $builder, $value) {
                 $builder->where('name', 'like', $value . '%');
             })
+            ->sortFor('name')
             ->filter();
     
         return UserResource::collection($builder->paginate());
