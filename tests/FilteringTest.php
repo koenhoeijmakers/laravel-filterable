@@ -121,7 +121,7 @@ class FilteringTest extends TestCase
 
     public function testDefaultSorting()
     {
-        $builder = $this->filtering->defaultSorting('name')->defaultSorting('name', true)->filter();
+        $builder = $this->filtering->sortFor('name')->defaultSorting('name', true)->filter();
 
         $this->assertEquals(
             'select * from "test_models" order by "name" desc',
