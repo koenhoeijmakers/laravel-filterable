@@ -91,6 +91,20 @@ class FilteringTest extends TestCase
         );
     }
 
+    public function testSendingAnArrayDoesntApplyFilters()
+    {
+        $this->request->replace(['q' => ['a' => 'yoink']]);
+
+        $builder = $this->filtering->filterFor('q', function (Builder $builder, $value) {
+            $builder->orderBy('name', $value);
+        })->filter();
+
+        $this->assertEquals(
+            'select * from "test_models"',
+            $builder->toSql()
+        );
+    }
+
     public function testDefaultSorting()
     {
         $builder = $this->filtering->defaultSorting('name')->defaultSorting('name', true)->filter();
