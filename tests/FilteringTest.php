@@ -105,6 +105,20 @@ class FilteringTest extends TestCase
         );
     }
 
+    public function testSendingAnUnregisteredSorterDoesntSort()
+    {
+        $this->request->replace(['sortBy' => 'non_existent', 'desc' => false]);
+
+        $builder = $this->filtering->sortFor('name', function (Builder $builder, $value) {
+            $builder->orderBy('name', $value);
+        })->filter();
+
+        $this->assertEquals(
+            'select * from "test_models"',
+            $builder->toSql()
+        );
+    }
+
     public function testDefaultSorting()
     {
         $builder = $this->filtering->defaultSorting('name')->defaultSorting('name', true)->filter();

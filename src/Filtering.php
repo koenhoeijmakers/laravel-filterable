@@ -146,14 +146,16 @@ class Filtering
             return;
         }
 
-        if (array_key_exists($sortBy, $this->sorters)) {
-            $callable = $this->sorters[$sortBy];
+        if (! array_key_exists($sortBy, $this->sorters)) {
+            return;
+        }
 
-            if (is_callable($callable)) {
-                $callable($this->builder, $type);
+        $callable = $this->sorters[$sortBy];
 
-                return;
-            }
+        if (is_callable($callable)) {
+            $callable($this->builder, $type);
+
+            return;
         }
 
         $this->builder->orderBy($sortBy, $type);
