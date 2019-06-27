@@ -22,9 +22,9 @@ Inject it in your controller (or resolve it from the container in any other way)
 
 namespace App\Http\Controllers\User;
 
-use KoenHoeijmakers\LaravelFilterable\Filtering;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering;
 
-class Index extends Controller
+class Index
 {
     protected $filtering;
 
