@@ -20,7 +20,7 @@ abstract class TestCase extends OrchestraTestCase
         $this->setUpDatabase();
     }
 
-    protected function getPackageProviders()
+    protected function getPackageProviders($app)
     {
         return [FilterableServiceProvider::class];
     }
