@@ -7,10 +7,11 @@ namespace KoenHoeijmakers\LaravelFilterable;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
 use function array_key_exists;
 use function is_callable;
 
-class Filtering
+class Filtering implements FilteringContract
 {
     /**
      * @var \Illuminate\Http\Request
@@ -62,9 +63,9 @@ class Filtering
     /**
      * @param  string   $key
      * @param  callable $callable
-     * @return $this
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
      */
-    public function filterFor(string $key, callable $callable): Filtering
+    public function filterFor(string $key, callable $callable): FilteringContract
     {
         $this->filters[$key] = $callable;
 
@@ -74,9 +75,9 @@ class Filtering
     /**
      * @param  string        $key
      * @param  callable|null $callable
-     * @return $this
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
      */
-    public function sortFor(string $key, ?callable $callable = null): Filtering
+    public function sortFor(string $key, ?callable $callable = null): FilteringContract
     {
         $this->sorters[$key] = $callable;
 
@@ -88,7 +89,7 @@ class Filtering
      * @param  bool   $desc
      * @return $this
      */
-    public function defaultSorting(string $key, bool $desc = false): Filtering
+    public function defaultSorting(string $key, bool $desc = false): FilteringContract
     {
         $this->defaultSortBy = $key;
         $this->defaultSortDesc = $desc;
@@ -98,9 +99,9 @@ class Filtering
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return $this
+     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
      */
-    public function builder(Builder $builder): Filtering
+    public function builder(Builder $builder): FilteringContract
     {
         $this->builder = $builder;
 

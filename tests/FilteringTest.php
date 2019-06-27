@@ -4,6 +4,7 @@ namespace Tests\Unit\Http;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
 use KoenHoeijmakers\LaravelFilterable\Filtering;
 use KoenHoeijmakers\LaravelFilterable\Tests\TestCase;
 use KoenHoeijmakers\LaravelFilterable\Tests\TestModel;
@@ -24,8 +25,14 @@ class FilteringTest extends TestCase
     {
         parent::setUp();
 
-        $this->filtering = $this->app->make(Filtering::class)->builder(TestModel::query());
+        $this->filtering = $this->app->make(FilteringContract::class)->builder(TestModel::query());
         $this->request = $this->app->make(Request::class);
+    }
+
+    public function testResolving()
+    {
+        $this->assertInstanceOf(FilteringContract::class, $this->app->make(FilteringContract::class));
+        $this->assertInstanceOf(FilteringContract::class, $this->app->make(Filtering::class));
     }
 
     public function testFilterReturnsBuilder()

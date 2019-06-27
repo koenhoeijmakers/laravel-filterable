@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace KoenHoeijmakers\LaravelFilterable;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
 
 class FilterableServiceProvider extends ServiceProvider
 {
@@ -17,7 +16,7 @@ class FilterableServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(FilteringContract::class, Filtering::class);
     }
 
     /**
