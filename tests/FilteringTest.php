@@ -100,14 +100,16 @@ class FilteringTest extends TestCase
 
     public function testSendingAnArrayDoesntApplyFilters()
     {
-        $this->request->replace(['q' => ['a' => 'yoink']]);
+        $this->request->replace(['q' => ['yoink']]);
 
-        $builder = $this->filtering->filterFor('q', function (Builder $builder, $value) {
-            $builder->orderBy('name', $value);
+        $builder = $this->filtering->filterFor('q', function (Builder $builder, array $value) {
+            foreach ($value as $item) {
+                $builder->where('name', $item);
+            }
         })->filter();
 
         $this->assertEquals(
-            'select * from "test_models"',
+            'select * from "test_models" where "name" = ?',
             $builder->toSql()
         );
     }

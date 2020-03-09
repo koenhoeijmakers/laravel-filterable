@@ -127,8 +127,8 @@ class Filtering implements FilteringContract
     protected function doFiltering(): void
     {
         foreach ($this->filters as $key => $callable) {
-            if ($this->request->filled($key) && ! is_array($input = $this->request->input($key))) {
-                $callable($this->builder, $input);
+            if ($this->request->filled($key)) {
+                $callable($this->builder, $this->request->input($key));
             }
         }
     }
