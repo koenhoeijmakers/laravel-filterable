@@ -38,8 +38,8 @@ class Index
         $builder = User::query();
         
         $this->filtering->builder($builder)
-            ->filterFor('name', function (Builder $builder, $value) {
-                $builder->where('name', 'like', $value . '%');
+            ->filterFor('name', fn(Builder $builder) => $builder
+                ->where('name', 'like', $value . '%');
             })
             ->sortFor('name')
             ->filter();
