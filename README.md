@@ -6,7 +6,7 @@
 [![Packagist](https://img.shields.io/packagist/dt/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://packagist.org/packages/koenhoeijmakers/laravel-filterable)
 [![license](https://img.shields.io/github/license/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://github.com/koenhoeijmakers/laravel-filterable)
 
-A laravel package to implement filtering by request parameters.
+A Laravel package to implement filtering by request parameters.
 ```php
 example.com/json?name=Koen
 ```
@@ -24,9 +24,9 @@ namespace App\Http\Controllers\User;
 
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering;
 
-class Index
+final class Index
 {
-    protected $filtering;
+    private Filtering $filtering;
 
     public function __construct(Filtering $filtering)
     {
@@ -39,9 +39,10 @@ class Index
         
         $this->filtering->builder($builder)
             ->filterFor('name', fn(Builder $builder) => $builder
-                ->where('name', 'like', $value . '%');
-            })
+                ->where('name', 'like', "{$value}%");
+            )
             ->sortFor('name')
+            ->defaultSorting('name')
             ->filter();
     
         return UserResource::collection($builder->paginate());
