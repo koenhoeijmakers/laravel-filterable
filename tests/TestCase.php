@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KoenHoeijmakers\LaravelFilterable\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Schema;
 use KoenHoeijmakers\LaravelFilterable\FilterableServiceProvider;
@@ -36,6 +39,16 @@ abstract class TestCase extends OrchestraTestCase
 }
 
 class TestModel extends Model
+{
+    protected $fillable = ['name'];
+
+    public function relation_models(): HasMany
+    {
+        return $this->hasMany(TestRelationModel::class);
+    }
+}
+
+class TestRelationModel extends Model
 {
     protected $fillable = ['name'];
 }

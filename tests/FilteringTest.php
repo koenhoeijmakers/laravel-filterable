@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Http;
+declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Builder;
+namespace KoenHoeijmakers\LaravelFilterable\Tests;
+
 use Illuminate\Http\Request;
-use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
+use Illuminate\Database\Eloquent\Builder;
 use KoenHoeijmakers\LaravelFilterable\Filtering;
-use KoenHoeijmakers\LaravelFilterable\Tests\TestCase;
-use KoenHoeijmakers\LaravelFilterable\Tests\TestModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
 
 class FilteringTest extends TestCase
 {
-    /**
-     * @var Filtering
-     */
-    protected $filtering;
+    protected FilteringContract $filtering;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected Request $request;
 
     public function setUp(): void
     {
@@ -29,18 +24,32 @@ class FilteringTest extends TestCase
         $this->request = $this->app->make(Request::class);
     }
 
-    public function testResolving()
+    public function testResolving(): void
     {
         $this->assertInstanceOf(FilteringContract::class, $this->app->make(FilteringContract::class));
         $this->assertInstanceOf(FilteringContract::class, $this->app->make(Filtering::class));
     }
 
-    public function testFilterReturnsBuilder()
+    public function testFilterReturnsBuilder(): void
     {
         $this->assertInstanceOf(Builder::class, $this->filtering->filter());
     }
 
-    public function testRegisteredFilterForWorks()
+    public function testCanPassEloquentBuilder(): void
+    {
+        $this->assertInstanceOf(HasMany::class,
+            $this->filtering->builder((new TestModel())->relation_models())->filter()
+        );
+    }
+
+    public function testCanPassQueryBuilder(): void
+    {
+        $this->assertInstanceOf(\Illuminate\Database\Query\Builder::class,
+            $this->filtering->builder($this->app->make(\Illuminate\Database\Query\Builder::class))->filter()
+        );
+    }
+
+    public function testRegisteredFilterForWorks(): void
     {
         $key = 'this-name-does-not-even-make-sense-but-its-explicit-so-what-the-hell';
 
@@ -56,7 +65,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testWorksWithDotNotation()
+    public function testWorksWithDotNotation(): void
     {
         $key = 'filter.name';
 
@@ -72,7 +81,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testRegisteredSortForWorksImplicitly()
+    public function testRegisteredSortForWorksImplicitly(): void
     {
         $this->request->replace(['sortBy' => 'name', 'desc' => true]);
 
@@ -84,7 +93,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testRegisteredSortForWorksExplicitly()
+    public function testRegisteredSortForWorksExplicitly(): void
     {
         $this->request->replace(['sortBy' => 'name', 'desc' => false]);
 
@@ -98,7 +107,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testSendingAnArrayDoesntApplyFilters()
+    public function testSendingAnArrayDoesntApplyFilters(): void
     {
         $this->request->replace(['q' => ['yoink']]);
 
@@ -114,7 +123,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testSendingAnUnregisteredSorterDoesntSort()
+    public function testSendingAnUnregisteredSorterDoesntSort(): void
     {
         $this->request->replace(['sortBy' => 'non_existent', 'desc' => false]);
 
@@ -128,7 +137,7 @@ class FilteringTest extends TestCase
         );
     }
 
-    public function testDefaultSorting()
+    public function testDefaultSorting(): void
     {
         $builder = $this->filtering->sortFor('name')->defaultSorting('name', true)->filter();
 

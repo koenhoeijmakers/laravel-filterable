@@ -4,67 +4,36 @@ declare(strict_types=1);
 
 namespace KoenHoeijmakers\LaravelFilterable;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
-use function array_key_exists;
 use function is_callable;
+use function array_key_exists;
 
 class Filtering implements FilteringContract
 {
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
+    protected Request $request;
 
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
+    protected Repository $config;
 
-    /**
-     * @var Builder
-     */
-    protected $builder;
+    protected EloquentBuilderContract|QueryBuilderContract $builder;
 
-    /**
-     * @var array
-     */
-    protected $filters = [];
+    protected array $filters = [];
 
-    /**
-     * @var array
-     */
-    protected $sorters = [];
+    protected array $sorters = [];
 
-    /**
-     * @var string|null
-     */
-    protected $defaultSortBy = null;
+    protected ?string $defaultSortBy = null;
 
-    /**
-     * @var bool
-     */
-    protected $defaultSortDesc = false;
+    protected bool $defaultSortDesc = false;
 
-    /**
-     * Filtering constructor.
-     *
-     * @param  \Illuminate\Http\Request                $request
-     * @param  \Illuminate\Contracts\Config\Repository $config
-     */
     public function __construct(Request $request, Repository $config)
     {
         $this->request = $request;
         $this->config = $config;
     }
 
-    /**
-     * @param  string   $key
-     * @param  callable $callable
-     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
-     */
     public function filterFor(string $key, callable $callable): FilteringContract
     {
         $this->filters[$key] = $callable;
@@ -72,11 +41,6 @@ class Filtering implements FilteringContract
         return $this;
     }
 
-    /**
-     * @param  string        $key
-     * @param  callable|null $callable
-     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
-     */
     public function sortFor(string $key, ?callable $callable = null): FilteringContract
     {
         $this->sorters[$key] = $callable;
@@ -84,11 +48,6 @@ class Filtering implements FilteringContract
         return $this;
     }
 
-    /**
-     * @param  string $key
-     * @param  bool   $desc
-     * @return $this
-     */
     public function defaultSorting(string $key, bool $desc = false): FilteringContract
     {
         $this->defaultSortBy = $key;
@@ -97,21 +56,14 @@ class Filtering implements FilteringContract
         return $this;
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return \KoenHoeijmakers\LaravelFilterable\Contracts\Filtering
-     */
-    public function builder(Builder $builder): FilteringContract
+    public function builder(EloquentBuilderContract|QueryBuilderContract $builder): FilteringContract
     {
         $this->builder = $builder;
 
         return $this;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function filter(): Builder
+    public function filter(): EloquentBuilderContract|QueryBuilderContract
     {
         $this->doFiltering();
         $this->doSorting();
@@ -119,11 +71,6 @@ class Filtering implements FilteringContract
         return $this->builder;
     }
 
-    /**
-     * Handles the filtering.
-     *
-     * @return void
-     */
     protected function doFiltering(): void
     {
         foreach ($this->filters as $key => $callable) {
@@ -133,15 +80,10 @@ class Filtering implements FilteringContract
         }
     }
 
-    /**
-     * Handles the sorting.
-     *
-     * @return void
-     */
     protected function doSorting(): void
     {
         $sortBy = $this->getSortBy();
-        $type = $this->getDesc() ? 'desc' : 'asc';
+        $direction = $this->getDesc() ? 'desc' : 'asc';
 
         if (null === $sortBy) {
             return;
@@ -154,17 +96,14 @@ class Filtering implements FilteringContract
         $callable = $this->sorters[$sortBy];
 
         if (is_callable($callable)) {
-            $callable($this->builder, $type);
+            $callable($this->builder, $direction);
 
             return;
         }
 
-        $this->builder->orderBy($sortBy, $type);
+        $this->builder->orderBy($sortBy, $direction);
     }
 
-    /**
-     * @return bool
-     */
     protected function getDesc(): bool
     {
         return (bool) $this->request->input(
@@ -173,9 +112,6 @@ class Filtering implements FilteringContract
         );
     }
 
-    /**
-     * @return string|null
-     */
     protected function getSortBy(): ?string
     {
         $sortBy = $this->request->input(
