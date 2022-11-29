@@ -1,4 +1,5 @@
 # Laravel Filterable
+[![Build](https://github.com/koenhoeijmakers/laravel-filterable/actions/workflows/build.yml/badge.svg)](https://github.com/koenhoeijmakers/laravel-filterable/actions/workflows/build.yml)
 [![Packagist](https://img.shields.io/packagist/v/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://packagist.org/packages/koenhoeijmakers/laravel-filterable)
 [![Packagist](https://img.shields.io/packagist/dt/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://packagist.org/packages/koenhoeijmakers/laravel-filterable)
 [![license](https://img.shields.io/github/license/koenhoeijmakers/laravel-filterable.svg?colorB=brightgreen)](https://github.com/koenhoeijmakers/laravel-filterable)
