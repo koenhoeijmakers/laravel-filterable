@@ -14,7 +14,7 @@ class FilterableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register():void
     {
         $this->app->bind(FilteringContract::class, Filtering::class);
     }
@@ -24,14 +24,15 @@ class FilterableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot():void
     {
         $this->publishes([
             $this->packageRootPath('config/filterable.php') => config_path('filterable.php'),
         ]);
 
         $this->mergeConfigFrom(
-            $this->packageRootPath('config/filterable.php'), 'filterable'
+            $this->packageRootPath('config/filterable.php'),
+            'filterable'
         );
     }
 
@@ -41,7 +42,7 @@ class FilterableServiceProvider extends ServiceProvider
      * @param $path
      * @return string
      */
-    protected function packageRootPath($path)
+    protected function packageRootPath($path):string
     {
         return __DIR__ . '/../' . $path;
     }

@@ -11,7 +11,6 @@ services:
     container_name: app
     volumes:
       - ./:/var/www
-      - ./.docker/php8.1-fpm/php.ini:/usr/local/etc/php/conf.d/local.ini
 
 volumes:
   app:
