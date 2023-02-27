@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace KoenHoeijmakers\LaravelFilterable\Tests;
+namespace KoenHoeijmakers\LaravelFilterable\Tests\Unit;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use KoenHoeijmakers\LaravelFilterable\Filtering;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use KoenHoeijmakers\LaravelFilterable\Tests\TestCase;
+use KoenHoeijmakers\LaravelFilterable\Tests\TestModel;
 use KoenHoeijmakers\LaravelFilterable\Contracts\Filtering as FilteringContract;
 
 class FilteringTest extends TestCase
